@@ -1,0 +1,8 @@
+*.c     linguist-language=c++ 
+*.cpp   linguist-language=c++ 
+*.h     linguist-language=c++ 
+*.a     linguist-language=c++
+*.so    linguist-language=c++ 
+*.so.*  linguist-language=c++ 
+*.lib   linguist-language=c++ 
+*.dll   linguist-language=c++ 
