@@ -3,14 +3,8 @@
 **tcpServer 是用c++编写的 tcp服务框架， API调用 异常简洁**
 
 # Features
-* 使用c++11新特性，支持可变模块参数传参，传参简洁
-* 目前支持 SQL 预处理执行和直接执行两种操作
-* 最底层使用数据库连接池进行封装，上层从连接池中取数据库连接句柄，实现数据库连接复用，提高效率
-* 获取数据库连接句柄前都会对连接是否正常进行判断，提高框架稳定性
-* 使用 CDBQuery 操作类前，必须先设置 CDBPool 连接池类的账号密码，并创建连接，首次创建的连接池作为默认连接池使用
-* CDBPool 连接池在创建前可以设置最大连接数和最小连接数，默认 3~10 个连接，然后由底层动态调整连接数实际数量，不足就创建，过多就删除释放
-* 当前实现了数据量操作的五种赋值方式，下面 sqlSelect() 用例有五种赋值方式的示范说明
-* 支持Linux和windows（目前所有文件都是跨平台的，后续添加windows编译文件）
+* 使用c++11新特性，Tcp 框架目前仅支持 linux 版
+* 基于 epoll 线程池实现，设置有任务队列任务线程池（默认不开启，需要人工开启设置）
 
 **WARNING: **
 > 目前 tcp 框架仅支持 linux 版，使用 epoll 实现
@@ -50,6 +44,7 @@ private:
 
 #include "CServerConnector.h"
 
+// socket 连接创建回调函数
 static
 void connectNotify(CServerConnector *CServerConnector_ti)
 {
@@ -58,12 +53,14 @@ void connectNotify(CServerConnector *CServerConnector_ti)
     cout << "ip " <<  CServerConnector_ti->host() << endl;
 }
 
+// socket 连接关闭销毁回调函数
 static
 void closeNotify(CServerConnector *CServerConnector_ti)
 {
     cout << "closeNotify " <<  CServerConnector_ti->host() << endl;
 }
 
+// socket 读业务操作回调函数
 static
 void readNotify(void *arg)
 {
@@ -82,26 +79,21 @@ void readNotify(void *arg)
          */
         
         cout << " len: " <<readlen<< "\nrecv: **"<<buf<<"**\n\n";
+		// 响应 client 数据
         CServerConnector_ti->sendBuf(buf, readlen);
     }
 }
 
 CTcpServer::CTcpServer(int port)
 {
+	// 设置端口号
     server.setPort(port);
+	// 设置 tcp 超时断开连接
     server.setTimeout(600 * 1000);
+	// 设置连接操作回调函数，断开连接操作回调函数，读事件操作回调函数，
     server.setNotify(connectNotify, closeNotify, readNotify);
+	// 设置任务处理线程池 5~15 个线程数范围，任务队列里最多容量 5000 个任务
     server.setThreadPoolRange(5, 15, 5000);
-}
-
-void CTcpServer::start()
-{
-    server.open(2);
-}
-
-void CTcpServer::stop()
-{
-    server.clear();
 }
 
 
@@ -112,6 +104,7 @@ void CTcpServer::stop()
 
 int main()
 {
+	// 申明 TCP 服务对象，然后开启服务
     CTcpServer tcpServ(8185);
     tcpServ.start();
     while (1) {
