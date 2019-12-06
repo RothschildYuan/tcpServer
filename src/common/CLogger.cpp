@@ -8,7 +8,9 @@
 //#include "Common.h"
 #include "stdarg.h"
 
-static string getLocalDataFile(int32_t num = 0){
+namespace {
+
+string getLocalDataFile(int32_t num = 0){
     time_t t = time(nullptr) - num * 86400;
     //Printf("%s\n",ctime(&t));
     struct tm* pt = localtime(&t);
@@ -17,8 +19,7 @@ static string getLocalDataFile(int32_t num = 0){
     return string(buf);
 }
 
-string CLogger::m_log_file_name = getLocalDataFile();                       // 日志文件的名
-ofstream CLogger::m_log_file_stream = ofstream(m_log_file_name.c_str() ,ios::out | ios::app);
+}
 
 void CLogger::ReInitLoggerFile()
 {
@@ -26,7 +27,17 @@ void CLogger::ReInitLoggerFile()
     if(m_log_file_stream.is_open()) {
         m_log_file_stream.close();
     }
-    m_log_file_stream = ofstream(m_log_file_name.c_str() ,ios::out | ios::app);
+    m_log_file_stream.open(m_log_file_name.c_str() ,ios::out | ios::app);
+}
+
+CLogger::CLogger() {
+    m_log_file_name = getLocalDataFile();                       // 日志文件的名
+    m_log_file_stream.open(m_log_file_name.c_str() ,ios::out | ios::app);
+}
+
+CLogger::~CLogger(){
+    getStream() << endl << flush;
+    m_log_file_stream.close();
 }
 
 ostream& CLogger::getStream(){
@@ -55,11 +66,6 @@ ostream& CLogger::start()
         ReInitLoggerFile();
     }
     return getStream()<<flush;
-}
-
-CLogger::~CLogger(){
-    getStream() << endl << flush;
-    m_log_file_stream.close();
 }
 
 void dbg_msg(const char* format, ...) {

@@ -1,4 +1,4 @@
-#include "cAdjustThread.h"
+#include "CAdjustThread.h"
 
 #include "CThreadPool.h"
 #include "config.h"
