@@ -61,6 +61,8 @@ private:
     atomic_int              m_nCount;   // epoll 返回堆监听的连接数
     list<CServerConnector*> m_listConns;// tcp 连接队列，连接可循环使用，不用经常 delete，new 降低资源消耗
     ACTMutex                m_connMutex;
+
+    const int EPOLL_SIZE = 1024*10;
 };
 
 #endif // CServerRWLISTEN_H

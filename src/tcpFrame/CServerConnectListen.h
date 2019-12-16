@@ -34,6 +34,8 @@ private:
 
 private:
     int m_epd; // epoll 反应堆句柄
+
+    const int EPOLL_SIZE = 10;
 };
 
 #endif // CServerCONNECTLISTEN_H

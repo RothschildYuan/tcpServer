@@ -4,13 +4,10 @@
 #include "CApplication.h"
 #include "CServerConnectListen.h"
 #include "CServerConnector.h"
-//#include "common.h"
 #include "CLogger.h"
 #include "CDateTime.h"
 #include "SocketUtil.h"
 #include "CThreadPool.h"
-
-#define EPOLL_SIZE 1024*10
 
 CServerRWListen::CServerRWListen(CServerSocket *tSerSocket, bool isDetach)
     :CBaseThread(isDetach)
